@@ -1,2 +1,2 @@
 # Make Money (v2+)
-Unmangling the original repo for something hopefully more organised
+Creating a whole new repo, in hopes of having some less mangled and more organised
