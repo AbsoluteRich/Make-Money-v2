@@ -1,3 +1,9 @@
+# Own additions
+*.json
+*.txt
+*.toml
+notes/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

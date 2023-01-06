@@ -1,2 +1,4 @@
 # Make Money (v2+)
-Creating a whole new repo, in hopes of having some less mangled and more organised
+Proper standard is to use the same repository across versions but it's so mangled I may as well create a new one
+
+In my defence, it was my first time using GitHub and now I have a better idea of project structure 
