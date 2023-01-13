@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 import toml
 from json import dumps as format_dict
-
+import random
 
 # ================================= EXTERNAL VARIABLES =================================
 print("Setting variables...")
@@ -22,9 +22,9 @@ changelog = versioning.get_changelog()
 print("Reading save file...")
 
 try:
-    with open("save.toml", "r") as f:
-        save_file = toml.loads(f.read())
-    del f
+    with open("save.toml", "r") as f_in:
+        save_file = toml.loads(f_in.read())
+    del f_in
 except FileNotFoundError:
     utils.force_exit("Save file not found. Please read the release notes for more instructions.")
 
@@ -40,6 +40,7 @@ def create_checkstring():
     checkstring = []
     sum_of_numbers = 0
 
+    # Creating the sum
     for x in save_file:
         if x in ["coins", "shinies", "debt"]:
             sum_of_numbers += int(save_file[x])
@@ -53,7 +54,7 @@ def create_checkstring():
     if divided.is_integer():
         # Number is divisible
         checkstring.append(0)
-        checkstring.append(divided)
+        checkstring.append(random.randint(0, 99_999_999))  # Make it look like there's some important info
     else:
         # Number is not divisible
         checkstring.append(1)
@@ -69,11 +70,11 @@ def check_checkstring():
 
 
 def update_save():
-    save_file["core"]["checksum"] = 0
+    save_file["core"]["checkstring"] = create_checkstring()
 
-    with open("save.toml", "w") as f:
-        f.write(toml.dumps(save_file))    
-    del f
+    with open("save.toml", "w") as f_out:
+        f_out.write(toml.dumps(save_file))
+    del f_out
 
 
 # ================================= FUNCTIONS =================================
@@ -172,30 +173,38 @@ def main():
             spam_server.send(choice)
 
         case "debug":
-            choice = sinput("(debug/spam/error/exit)", mode="compare")
+            if read_save("flags", "dev_mode"):
+                choice = sinput("(print/send/error/exit/edit)", mode="compare")
 
-            match choice:
-                case "print":
-                    print(format_dict(save_file, indent=4))
+                match choice:
+                    case "print":
+                        print(format_dict(save_file, indent=4))
 
-                case "send":
-                    choice = sinput("Debug or spam?", mode="compare")
+                    case "send":
+                        choice = sinput("Debug or spam?", mode="compare")
 
-                    match choice:
-                        case "debug":
-                            debug_server.send(sinput(prompt="", sep=""))
+                        match choice:
+                            case "debug":
+                                debug_server.send(sinput(prompt="", sep=""))
 
-                        case "spam":
-                            spam_server.send(sinput(prompt="", sep=""))
+                            case "spam":
+                                spam_server.send(sinput(prompt="", sep=""))
 
-                case "error":
-                    raise Exception("This is an error.")
+                    case "error":
+                        raise Exception("This is an error.")
 
-                case "exit":
-                    utils.force_exit("This is a force exit.")
+                    case "exit":
+                        utils.force_exit("This is a force exit.")
+
+                    case "edit":
+                        choice = int(sinput(sep=""))
+                        save_file["coins"] = choice
+
+            else:
+                utils.force_exit(error="Not so fast", prompt=False)
 
         case "work":
-            save_file["coins"] += 1
+            save_file["coins"] += random.randint(50, 250)
 
         case "shop":
             for x in items:
@@ -205,20 +214,32 @@ def main():
             pass  # Todo
 
 
+def handle_error(error):
+    error = f"{type(error).__name__}: {error}"
+    debug_server.send(error)
+    utils.log(error)
+    del error
+
+
 # ================================= MAIN LOOP =================================
 if __name__ == "__main__":
     try:
         startup()
 
         while True:
-            print(f"Coins: {save_file['coins']}")
-            print(f"Shinies: {save_file['shinies']}")
-            main()
-            update_save()
-            print("\n")
+            try:
+                print(f"Coins: {save_file['coins']}")
+                print(f"Shinies: {save_file['shinies']}")
+                main()
+                update_save()
+                print("\n")
 
-    except Exception as err:
+            except Exception as e:   # It's stupid that I need to copy these twice
+                print("An error has occurred. See logs for more info.\n")
+                handle_error(e)
+                del e
+
+    except Exception as e:   # but it's the only obvious solution as I need to do this for both functions
         print("An error has occurred. See logs for more info.\n")
-        err = f"{type(err).__name__}: {err}"
-        debug_server.send(err)
-        utils.log(err)
+        handle_error(e)
+        del e

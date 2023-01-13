@@ -84,7 +84,7 @@ while True:
                 "core": {
                     "wins": 0,
                     "runs": 0,
-                    "checksum": [],
+                    "checkstring": "",
                 },
 
                 "preferences": {
