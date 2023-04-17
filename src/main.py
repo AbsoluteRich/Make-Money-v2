@@ -28,6 +28,7 @@ try:
 except FileNotFoundError:
     utils.force_exit("Save file not found. Please read the release notes for more instructions.")
 
+
 def read_save(section, subkey):
     section = save_file.get(section, None)
     if section is None:
@@ -36,7 +37,7 @@ def read_save(section, subkey):
 
 
 def create_checkstring():
-    # ewihrgwehrwawehrwha
+    # Use tried and tested algorithms like MD5 to generate a checksum? Who do you think I am, someone smart?
     checkstring = []
     sum_of_numbers = 0
 
@@ -54,19 +55,22 @@ def create_checkstring():
     if divided.is_integer():
         # Number is divisible
         checkstring.append(0)
-        checkstring.append(random.randint(0, 99_999_999))  # Make it look like there's some important info
+        checkstring.append(int(random.randint(0, 99_999_999)))  # Make it look like there's some important info
     else:
         # Number is not divisible
         checkstring.append(1)
         divided = str(divided).split(".")
         divided = divided[1]
-        checkstring.append(divided)
+        checkstring.append(int(divided))
 
-    return f"{checkstring[0]};{checkstring[1]};{checkstring[2]}"
+    # Why does the join method also need a homogeneous list
+    return ";".join(str(num) for num in checkstring)
 
 
 def check_checkstring():
-    pass
+    pass  # This should read the save file, then create a checkstring from the sum of its numbers
+    # and compare it with whatever's in the save file
+    # return generated_checkstring == checkstring
 
 
 def update_save():
@@ -234,12 +238,12 @@ if __name__ == "__main__":
                 update_save()
                 print("\n")
 
-            except Exception as e:   # It's stupid that I need to copy these twice
+            except Exception as e:  # It's stupid that I need to copy these twice
                 print("An error has occurred. See logs for more info.\n")
                 handle_error(e)
                 del e
 
-    except Exception as e:   # but it's the only obvious solution as I need to do this for both functions
+    except Exception as e:  # but it's the only obvious solution as I need to do this for both functions
         print("An error has occurred. See logs for more info.\n")
         handle_error(e)
         del e
