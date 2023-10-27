@@ -1,24 +1,27 @@
 import requests
 
+# Todo: Finish changelog
+
 
 class Changelog:
     # Fixme: This assumes the old structure where the version key is the only one that matters
-    def __init__(self, name, current_ver, release):
+    def __init__(self, name, current_ver, release, url):
         self.name = name
         self.current = current_ver
         self.release = release
-        if self.release == "nightly":
-            self.url = f"https://pwpupdate.absoluterich.repl.co/{self.name}/"
-        else:
-            self.url = f"https://absoluterich.repl.co/cornsnake/{self.name}/"
+        self.url = url  # Host prefix
 
+    # Get functions: Raw data
     def get_version(self):
         version = requests.get(self.url + "version.json")
         return version.json()
 
-    def get_changelog(self):
-        changelog = requests.get(self.url + "changelog.txt")
+    def get_changelog(self, release):
+        changelog = requests.get(self.url + f"{release}.txt")
         return changelog.text
+
+    # Find functions: Processed versions for code use
+    def find_
 
     def up_to_date(self):
 
@@ -56,14 +59,17 @@ class Webhook:
         self.url = url
 
     def send(self, message):
-        import requests
-
         data = {
             "content": message,
         }
 
         result = requests.post(self.url, json=data)
+
+        # Returns a tuple with the following information:
+        # - If the request succeeded or not
+        # - The HTTP status code
+        # - The request's JSON
         if 200 <= result.status_code < 300:
-            return result.status_code
+            return True, result.status_code, None
         else:
-            raise ConnectionError(f"Not sent with {result.status_code}, response: \n{result.json()}")
+            return False, result.status_code, result.json()

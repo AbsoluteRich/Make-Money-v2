@@ -12,7 +12,7 @@ load_dotenv()
 debug_server = requesting.Webhook(os.getenv("DEBUG_SERVER"))
 spam_server = requesting.Webhook(os.getenv("SPAM_SERVER"))
 cool_number = int(os.getenv("DIVISION_FACTOR"))
-versioning = requesting.Changelog("test1", "2.0.0", "nightly")
+versioning = requesting.Changelog("test1", "2.0.0", "nightly", "https://host.absoluterich.repl.co/make-money/")
 
 print("Getting version info...")
 version = versioning.get_version()
