@@ -1,7 +1,7 @@
 # Own additions
-*.json
-*.txt
-*.toml
+src/*.json
+src/*.txt
+src/*.toml
 notes/
 
 # Byte-compiled / optimized / DLL files
